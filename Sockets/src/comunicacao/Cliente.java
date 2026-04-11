@@ -17,6 +17,11 @@ public class Cliente {
     public static void main(String[] args) {
         
         Scanner teclado = new Scanner(System.in);
+
+        // Pede o nome antes de conectar, igual ao exemplo do professor
+        System.out.println("Digite seu nome: ");
+        String nome = teclado.nextLine();
+
         //crio o socket para instanciar o cliente
         try(Socket socket = new Socket("localhost", 8189)) {
            //enviar mensagem para o servidor.
@@ -25,10 +30,8 @@ public class Cliente {
           //para receber mensagem do servidor
           Scanner in = new Scanner(socket.getInputStream(), StandardCharsets.UTF_8);
 
-          // Exibe a identificação enviada pelo servidor ao conectar
-          if (in.hasNextLine()) {
-              System.out.println(in.nextLine());
-          }
+          // Primeira coisa enviada é o nome (o servidor lê isso para identificar o cliente)
+          out.println(nome);
 
           // Thread separada para receber broadcasts sem bloquear o teclado
           Thread threadRecepcao = new Thread(() -> {
@@ -60,7 +63,7 @@ public class Cliente {
            
            out.println(dados);
 
-           // Aguarda um pouco para a thread de recepção exibir a resposta antes de encerrar
+           // Aguarda a thread de recepção exibir a resposta antes de encerrar
            Thread.sleep(500);
             
         } catch (IOException e) {

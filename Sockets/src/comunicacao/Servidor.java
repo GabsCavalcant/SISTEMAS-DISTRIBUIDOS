@@ -44,7 +44,8 @@ public class Servidor {
             e.getMessage();
         }
     }
-// Envia mensagem para todos os clientes conectados, identificando o remetente
+
+    // Envia mensagem para todos os clientes conectados, identificando o remetente
     private static synchronized void broadcast(String nomeCliente, String mensagem) {
         for (PrintWriter out : clientesConectados) {
             out.println("[" + nomeCliente + "]: " + mensagem);
@@ -59,19 +60,16 @@ public class Servidor {
         clientesConectados.remove(out);
     }
 
- 
+    // ---------------------------------------------------------------
     // Classe interna que atende UM cliente — mesma lógica original
-  
+    // ---------------------------------------------------------------
     static class ClienteHandler implements Runnable {
 
-        private static int contadorClientes = 0;
         private final Socket sIncoming;
-        private final String nomeCliente;
+        private String nomeCliente;  // agora vem do cliente, como no exemplo do professor
 
         public ClienteHandler(Socket sIncoming) {
             this.sIncoming = sIncoming;
-            contadorClientes++;
-            this.nomeCliente = "Cliente-" + contadorClientes;
         }
 
         @Override
@@ -85,8 +83,9 @@ public class Servidor {
 
                 adicionarCliente(out);
 
-                // Informa ao cliente seu identificador
-                out.println("Voce esta conectado como " + nomeCliente);
+                // Primeira mensagem recebida é o nome do cliente (igual ao professor)
+                nomeCliente = in.nextLine();
+                System.out.println(nomeCliente + " conectou-se.");
 
                 while (in.hasNextLine()) {
 
@@ -112,6 +111,7 @@ public class Servidor {
             }
         }
 
+        // Mantido exatamente igual ao original
         private static void calcular(Scanner in, PrintWriter out) {
             if (in.hasNextLine()) {
                 String expressao = in.nextLine();
@@ -133,7 +133,7 @@ public class Servidor {
             }
         }
 
-      
+        // Mantido exatamente igual ao original
         private static void stringCalc(Scanner in, PrintWriter out) {
             if (in.hasNextLine()) {
                 String dados = in.nextLine();
