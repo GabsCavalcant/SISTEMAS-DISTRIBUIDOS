@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package comunicacao;
 
 import java.io.IOException;
@@ -26,9 +22,23 @@ public class Cliente {
            //enviar mensagem para o servidor.
           PrintWriter out = new PrintWriter(socket.getOutputStream(), true, StandardCharsets.UTF_8);
           
-          //para recber mensagem do servidor
+          //para receber mensagem do servidor
           Scanner in = new Scanner(socket.getInputStream(), StandardCharsets.UTF_8);
-          
+
+          // Exibe a identificação enviada pelo servidor ao conectar
+          if (in.hasNextLine()) {
+              System.out.println(in.nextLine());
+          }
+
+          // Thread separada para receber broadcasts sem bloquear o teclado
+          Thread threadRecepcao = new Thread(() -> {
+              while (in.hasNextLine()) {
+                  System.out.println("RESPOSTA DO SERVIDOR: " + in.nextLine());
+              }
+          });
+          threadRecepcao.setDaemon(true);
+          threadRecepcao.start();
+
           System.out.println("Entre com o (1) Se quiser acessar a calculadora, ou (2) Para buscar String");
             
          String servico = teclado.nextLine(); 
@@ -49,13 +59,14 @@ public class Cliente {
            String dados = teclado.nextLine();
            
            out.println(dados);
-           
-            if(in.hasNextLine()){
-                System.out.println("RESPOSTA DO SERVIDOR: " + in.nextLine());
-            }
+
+           // Aguarda um pouco para a thread de recepção exibir a resposta antes de encerrar
+           Thread.sleep(500);
             
         } catch (IOException e) {
             e.getMessage();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     
     
